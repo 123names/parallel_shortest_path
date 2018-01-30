@@ -84,19 +84,18 @@ void split(int row, int column, int mat[row][column], int totalParts, int parts[
 	}
 }
 
-void dijkstra(int rowSize,int columnSize, int cost[rowSize][columnSize], int source, int target){
+void dijkstra(int rowSize,int columnSize, int cost[rowSize][columnSize], int source){
 	// keep distance array, 
 	int dist[columnSize], pred[columnSize], visited[columnSize];
 	int count, mindistance, nextNode;
 	// initial distance array from source, and set visited flag to 0
 	for(int i =0; i<columnSize; i++){
-		dist[i] = cost[source][i];
-		pred[i] = source;
+		dist[i] = INF;
 		visited[i] = 0;
 	}
 	// since it start with source, change source flag to 1
-	visited[source] = 1;
-	count=1;
+	dist[source]=0;
+	count=0;
 	printArray(rowSize, dist);
 	// loop through all nodes
 	while(count<rowSize-1){
@@ -130,7 +129,7 @@ void dijkstra(int rowSize,int columnSize, int cost[rowSize][columnSize], int sou
 	}
 	for(int i=0;i<rowSize;i++){
 		if(i!=source){
-			printf("\nDistance form node%d to node%d = %d", source, i, dist[i]);
+			printf("\nDistance form node%2d to node%2d = %d", source, i, dist[i]);
 			printf("\nPath=%d",i);
 			int j=i;
 			do{
@@ -143,7 +142,6 @@ void dijkstra(int rowSize,int columnSize, int cost[rowSize][columnSize], int sou
 }
 
 int main(){
-	int numParts = 2;
 	int totallines, totalNodes = 0;
 	// read file
 	FILE *fin = fopen("simple_graph.txt", "r");
@@ -172,5 +170,5 @@ int main(){
 		cost[destination[i]][source[i]] = weight[i];
 	}
 	printMatrix(totalNodes, totalNodes, cost);
-	dijkstra(totalNodes,totalNodes, cost, 0, 7);
+	dijkstra(totalNodes,totalNodes, cost, 3);
 }
