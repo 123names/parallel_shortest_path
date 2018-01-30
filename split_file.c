@@ -2,18 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-void printParts(int rowSize, int columnSize, int numParts, int parts[rowSize][columnSize][numParts]){
-	for(int i =0; i<numParts; i++){
-		for (int j=0; j<rowSize; j++){
-			for (int k=0; k<columnSize; k++){
-				printf("%5d", parts[j][k][i]);
-			}
-			printf("\n");
-		}
-		printf("\n");
-	}
-}
-
 void printArray(int size, int *array){
 	for(int i=0; i<size; i++){
 		printf("%d\t", array[i]);
@@ -21,13 +9,14 @@ void printArray(int size, int *array){
 	printf("\n");
 }
 
-void printMatrix(int size, int matrix[size][size]){
-	for(int i =0; i<size; i++){
-		for(int j=0; j<size; j++){
+void printMatrix(int rowSize, int columnSize, int matrix[rowSize][columnSize]){
+	for(int i =0; i<rowSize; i++){
+		for(int j=0; j<columnSize; j++){
 			printf("%d\t", matrix[i][j]);
 		}
 		printf("\n");
 	}
+	printf("\n");
 }
 
 int countline(FILE * fin){
@@ -78,15 +67,13 @@ int countNodes(int size, int merged[]){
 	return counter;
 }
 
-void split(int row, int column, int mat[row][column], int totalParts, int parts[][column][totalParts]){
+void split(int row, int column, int mat[row][column], int totalParts, int parts[row/totalParts][column], int requrePart){
 	// if cost matrix can be divide equally
 	if(row%totalParts==0){
 		int partSize = row/totalParts;
-		for (int k=0; k<totalParts; k++){
-			for (int i = 0; i < partSize; i++) {
-				for (int j = 0; j < column; j++) {
-					parts[i][j][k] = mat[(i+k*partSize)][j];
-				}
+		for (int i = 0; i < partSize; i++) {
+			for (int j = 0; j < column; j++) {
+				parts[i][j] = mat[(i+requrePart*partSize)][j];
 			}
 		}
 	}
@@ -126,11 +113,8 @@ int main(){
 		cost[source[i]][destination[i]] = weight[i];
 		cost[destination[i]][source[i]] = weight[i];
 	}
-	//printMatrix(totalNodes, cost);
-	// split cost matrix
-	int parts[totalNodes/numParts][totalNodes][numParts];
-	split(totalNodes, totalNodes, cost, numParts, parts);
-	printParts(totalNodes/numParts, totalNodes, numParts, parts);
+	printMatrix(totalNodes, totalNodes, cost);
+
 	// Put splited matrix into binary file
 	for(int i =0; i<numParts; i++){
 		// generate file name
@@ -138,9 +122,13 @@ int main(){
 		char *name = "part";
 		char fname [40] = {0};
 		sprintf(fname, "%s%d.bin", name, i);
+		// split cost matrix
+		int parts[totalNodes/numParts][totalNodes];
+		split(totalNodes, totalNodes, cost, numParts, parts, i);
+		printMatrix(totalNodes/numParts, totalNodes, parts);
 		// write part to binary file
 		fout = fopen(fname, "wb");
-		fwrite(&parts[0][0][i], totalNodes/numParts*totalNodes*sizeof(int),1,fout);
+		fwrite(&parts, sizeof(parts),1,fout);
 		fclose(fout);
 		
 	}
