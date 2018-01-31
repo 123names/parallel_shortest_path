@@ -84,6 +84,22 @@ void split(int row, int column, int mat[row][column], int totalParts, int parts[
 	}
 }
 
+void printPath(int source, int numNodes, int dist[numNodes], int pred[numNodes]){
+
+	for(int i=0;i<numNodes;i++){
+		if(i!=source){
+			printf("\nDistance form node%2d to node%2d = %d", source, i, dist[i]);
+			printf("\nPath=%d",i);
+			int j=i;
+			do{
+				j=pred[j];
+				printf("<-%d",j);
+			}while(j!=source);
+		}
+	}
+	printf("\n");
+}
+
 void dijkstra(int rowSize,int columnSize, int cost[rowSize][columnSize], int source){
 	// keep distance array, 
 	int dist[columnSize], pred[columnSize], visited[columnSize];
@@ -127,18 +143,7 @@ void dijkstra(int rowSize,int columnSize, int cost[rowSize][columnSize], int sou
 		count++;
 		printArray(rowSize,dist);
 	}
-	for(int i=0;i<rowSize;i++){
-		if(i!=source){
-			printf("\nDistance form node%2d to node%2d = %d", source, i, dist[i]);
-			printf("\nPath=%d",i);
-			int j=i;
-			do{
-				j=pred[j];
-				printf("<-%d",j);
-			}while(j!=source);
-		}
-	}
-	printf("\n");
+	printPath(source, rowSize, dist,pred);
 }
 
 int main(){
