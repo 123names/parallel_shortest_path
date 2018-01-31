@@ -113,10 +113,11 @@ void dijkstra(int rowSize,int columnSize, int cost[rowSize][columnSize], int sou
 	dist[source]=0;
 	count=0;
 	printArray(rowSize, dist);
+	printf("\n");
 	// loop through all nodes
-	while(count<rowSize-1){
+	while(count<rowSize){
 		mindistance = INF;
-		// find neighborNode that give minimum distance
+		// search in distance array that give minimum distance
 		for(int i=0; i<rowSize;i++){
 			if(dist[i]<mindistance&&!visited[i]){
 				mindistance = dist[i];
@@ -146,7 +147,7 @@ void dijkstra(int rowSize,int columnSize, int cost[rowSize][columnSize], int sou
 	printPath(source, rowSize, dist,pred);
 }
 
-int main(){
+int main(int argc, char *argv[]){
 	int totallines, totalNodes = 0;
 	// read file
 	FILE *fin = fopen("simple_graph.txt", "r");
@@ -174,6 +175,10 @@ int main(){
 		cost[source[i]][destination[i]] = weight[i];
 		cost[destination[i]][source[i]] = weight[i];
 	}
+	int fromSource = 0;
+	if(argc==2) {
+		fromSource = atoi(argv[1]);
+	}
 	printMatrix(totalNodes, totalNodes, cost);
-	dijkstra(totalNodes,totalNodes, cost, 3);
+	dijkstra(totalNodes,totalNodes, cost, fromSource);
 }
