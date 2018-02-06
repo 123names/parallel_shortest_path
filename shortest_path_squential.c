@@ -101,19 +101,22 @@ void printPath(int source, int numNodes, int dist[numNodes], int pred[numNodes])
 }
 
 void dijkstra(int rowSize,int columnSize, int cost[rowSize][columnSize], int source){
-	// keep distance array, 
+	// keep distance array,
 	int dist[columnSize], pred[columnSize], visited[columnSize];
 	int count, mindistance, nextNode;
 	// initial distance array from source, and set visited flag to 0
 	for(int i =0; i<columnSize; i++){
 		dist[i] = INF;
 		visited[i] = 0;
+		pred[i]=-1;
 	}
 	// since it start with source, change source flag to 1
 	dist[source]=0;
 	count=0;
+	printf("Round: %d\n",count);
 	printArray(rowSize, dist);
-	printf("\n");
+	printArray(rowSize, pred);
+	printArray(rowSize, visited);
 	// loop through all nodes
 	while(count<rowSize){
 		mindistance = INF;
@@ -126,15 +129,12 @@ void dijkstra(int rowSize,int columnSize, int cost[rowSize][columnSize], int sou
 		}
 		// set nextnode flag to 1
 		visited[nextNode] = 1;
-		// update distance array only when 3 condition meet
+		// update distance array only when 2 condition meet
 		for(int i=0;i<rowSize;i++){
 			//1. The nextnode have edge to unvisited neighbor
 			if(!visited[i]){
-				//2. The distance between nextnode to unvisited neighbor is not INF 
-				//(Since i initializzed INF as 99, we do not need to check this condition because last
-				//if will check it
-				//3. (min-distance of privious node edge + nextnode's all edge) is smaller than 
-				//oranginal distance in distance array 
+				//2. (min-distance of privious node edge + nextnode's all edge) is smaller than
+				//oranginal distance in distance array
 				if(mindistance+cost[nextNode][i]<dist[i]){
 					dist[i] = mindistance+cost[nextNode][i];
 					pred[i]=nextNode;
@@ -142,7 +142,11 @@ void dijkstra(int rowSize,int columnSize, int cost[rowSize][columnSize], int sou
 			}
 		}
 		count++;
+		printf("Round: %d\n",count);
 		printArray(rowSize,dist);
+		printArray(rowSize,pred);
+		printArray(rowSize, visited);
+
 	}
 	printPath(source, rowSize, dist,pred);
 }
