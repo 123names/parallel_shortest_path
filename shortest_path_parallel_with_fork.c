@@ -116,6 +116,18 @@ void findLocalMin(struct Local_Min_Node *item,int partSize, int dist[partSize], 
 		}
 	}
 }
+void updateDistArray(int totalNodes,int partSize, int mindistance, int dist_local[], int pred_local[], int visited_local[], int childID, int nextNode){
+	int cost [totalNodes][partSize];
+	readPart(totalNodes, partSize, childID, cost);
+	for(int i=0; i<partSize;i++){
+		if(!visited_local[i]){
+			if(mindistance+cost[nextNode][i]<dist_local[i]){
+				dist_local[i] = mindistance+cost[nextNode][i];
+				pred_local[i] = nextNode;
+			}
+		}
+	}
+}
 
 void printPath(int source, int target, int numNodes, int dist[], int pred[]){
 
@@ -138,7 +150,7 @@ int main(int argc, char *argv[]){
 	// read file
 	FILE *fin = fopen("simple_graph.txt", "r");
 	totallines = countline(fin);
-	int source[totallines], destination[totallines], weight[totallines];
+	int source[totallines], destination[totallines], weight[totallines];	// update local distance array
 	readFile(fin, source, destination, weight);
 	// count nodes
 	int merged[totallines*2];
@@ -164,12 +176,12 @@ int main(int argc, char *argv[]){
 	int numParts = 2;
 	int fromSource = 0;
 	int target = 7;
-	int partSize = totalNodes/numParts;
 	if(argc==4) {
 		numParts = atoi(argv[1]);
 		fromSource = atoi(argv[2]);
 		target = atoi(argv[3]);
 	}
+	int partSize = totalNodes/numParts;
 	// Put splited matrix into binary file
 	for(int i =0; i<numParts; i++){
 		// generate file name
@@ -180,12 +192,13 @@ int main(int argc, char *argv[]){
 		// split cost matrix
 		int parts[totalNodes][totalNodes/numParts];
 		split(totalNodes, totalNodes, cost, numParts, parts, i);
-		printMatrix(totalNodes, totalNodes/numParts, parts);
+		//printMatrix(totalNodes, totalNodes/numParts, parts);
 		// write part to binary file
 		fout = fopen(fname, "wb");
 		fwrite(&parts, sizeof(parts),1,fout);
 		fclose(fout);
 	}
+
 	// fork create mutiple process for find local_mindistance
 	// create pipe first, two pipe send result from parent to child with nextNode and send distance array part from child to parent
 	int pcfd[numParts][2];
@@ -204,7 +217,7 @@ int main(int argc, char *argv[]){
 	pid_t main = getpid();
 	pid_t children [numParts];
 	int childID = -1;
-	printf("%d\n", main);
+	printf("Parent: %d\n", main);
 
 	for(int i = 0; i<numParts; i++){
 		pid_t forkResult = fork();
@@ -316,16 +329,7 @@ int main(int argc, char *argv[]){
 				visited_local[local_node_position] = 1;
 			}
 			// update local distance array
-			int cost [totalNodes][partSize];
-			readPart(totalNodes, partSize, childID, cost);
-			for(int i=0; i<partSize;i++){
-				if(!visited_local[i]){
-					if(global_min[0]+cost[nextNode][i]<dist_local[i]){
-						dist_local[i] = global_min[0]+cost[nextNode][i];
-						pred_local[i] = nextNode;
-					}
-				}
-			}
+			updateDistArray(totalNodes, partSize, global_min[0], dist_local, pred_local, visited_local, childID, nextNode);
 			// find local min
 			struct Local_Min_Node node, *nodePointer;
 			nodePointer = &node;
