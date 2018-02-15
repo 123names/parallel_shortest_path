@@ -7,10 +7,6 @@
 
 const int INF = 999;
 const int SIGNAL = 9999;
-struct Local_Min_Node{
-	int local_minium_dist;
-	int local_minium_node;
-};
 
 void printArray(int size, int *array){
 	for(int i=0; i<size; i++){
@@ -108,11 +104,11 @@ void initialize_distance_array(int partSize, int dist[], int pred[], int visited
 		visited[i] = 0;
 	}
 }
-void findLocalMin(struct Local_Min_Node *item,int partSize, int dist[partSize], int pred[partSize], int visited[partSize], int partIndex){
+void findLocalMin(int local_minium [],int partSize, int dist[partSize], int pred[partSize], int visited[partSize], int partIndex){
 	for(int j=0;j<partSize; j++){
-		if(!visited[j] && dist[j]<item->local_minium_dist){
-			item->local_minium_dist = dist[j];
-			item->local_minium_node = j+(partIndex*partSize);
+		if(!visited[j] && dist[j]<local_minium[0]){
+			local_minium[0] = dist[j];
+			local_minium[1] = j+(partIndex*partSize);
 		}
 	}
 }
@@ -238,7 +234,7 @@ int main(int argc, char *argv[]){
 	if(main==getpid()){
 		int *dist = malloc(totalNodes* sizeof(int));
 		int *pred = malloc(totalNodes* sizeof(int));
-		struct Local_Min_Node node;
+		int local_minium [2];
 		int global_min[2];
 		bool flag = true;
 		int counter = 0;
@@ -262,11 +258,11 @@ int main(int argc, char *argv[]){
 			// find global min dist node as next node
 			for(int i = 0; i<numParts; i++){
 				close(cpfd[i][1]);
-				read(cpfd[i][0],&node,sizeof(node));
-				printf("Parent (%d) received: local_minium: %d, node: %d\n",getpid(),node.local_minium_dist,node.local_minium_node);
-				if(node.local_minium_dist<global_min[0]){
-					global_min[0] = node.local_minium_dist;
-					global_min[1] = node.local_minium_node;
+				read(cpfd[i][0],&local_minium,sizeof(local_minium));
+				printf("Parent (%d) received: local_minium: %d, node: %d\n",getpid(),local_minium[0],local_minium[1]);
+				if(local_minium[0]<global_min[0]){
+					global_min[0] = local_minium[0];
+					global_min[1] = local_minium[1];
 				}
 			}
 			if(global_min[0]==INF){
@@ -331,18 +327,17 @@ int main(int argc, char *argv[]){
 			// update local distance array
 			updateDistArray(totalNodes, partSize, global_min[0], dist_local, pred_local, visited_local, childID, nextNode);
 			// find local min
-			struct Local_Min_Node node, *nodePointer;
-			nodePointer = &node;
-			node.local_minium_dist = INF;
-			node.local_minium_node = -1;
-			findLocalMin(nodePointer,partSize,dist_local,pred_local,visited_local,childID);
+			int local_minium [2];
+			local_minium[0] = INF;
+			local_minium[1] = -1;
+			findLocalMin(local_minium,partSize,dist_local,pred_local,visited_local,childID);
 			printArray(partSize, dist_local);
 			printArray(partSize, visited_local);
 			printArray(partSize, pred_local);
 			// write local min to parent, parent calculate global min
 			close(cpfd[childID][0]);
-			write(cpfd[childID][1],&node,sizeof(node));
-			printf("Child %d(%d) send value: %d\n", childID,getpid(), node);
+			write(cpfd[childID][1],&local_minium,sizeof(local_minium));
+			printf("Child %d(%d) send local min dist: %d, node: %d\n", childID,getpid(), local_minium[0],local_minium[1]);
 		}
 	}
 	return 0;
