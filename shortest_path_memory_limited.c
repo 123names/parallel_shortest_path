@@ -78,29 +78,6 @@ void dijkstra(int totalParts,int totalNodes, int source, int dist[], int pred[],
 				nextNode = i;
 			}
 		}
-		/*
-		int mindistance[totalParts], mindistanceNode[totalParts];
-		for(int k =0; k<totalParts; k++){
-			// find minium distance from different part of matrix
-			mindistance[k]= INF;
-			for(int j=partSize*k;j<(partSize+1)*k; j++){
-				if(!visited[j] && dist[j]<mindistance[k]{
-					mindistance[k] = dist[j];
-					mindistanceNode[k] = i;
-				}
-			}
-		}
-		// compare to find minium distance node from return result
-		int local_minium = INF;
-		int local_minium_node = INF;
-		for(int k=0; k<totalParts; k++){
-			if(local_mindistance[k]<local_minium){
-				local_minium = local_mindistance[k];
-				local_minium_node = mindistanceNode[k];
-			}
-		}
-		visited[local_minium_node] = 1;
-		*/
 		visited[nextNode] = 1;
 		// update distance array
 		for(int k=0; k<totalParts; k++){
@@ -130,10 +107,10 @@ int main(int argc, char *argv[]){
 	if(argc==3) {
 		source = atoi(argv[1]);
 		target = atoi(argv[2]);
-    }
+  }
 	int totalNodes = 8;
 	int dist[totalNodes], pred[totalNodes], visited[totalNodes];
-	
+
 	// pass distance array to function
 	dijkstra(part,totalNodes, source, dist, pred, visited);
 	// print result path

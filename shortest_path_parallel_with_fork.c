@@ -81,6 +81,19 @@ int countNodes(int size, int merged[]){
 	return counter;
 }
 
+void initial_cost_matrix(int totalNodes, int cost [totalNodes][totalNodes]){
+	for (int i=0; i<totalNodes;i++){
+		for(int j=0; j<totalNodes; j++){
+			if(i==j){
+				cost[i][j] = 0;
+			}
+			else{
+				cost[i][j] = INF;
+			}
+		}
+	}
+}
+
 void split(int row, int column, int mat[row][column], int totalParts, int parts[row][column/totalParts], int requrePart){
 	// if cost matrix can be divide equally
 	if(row%totalParts==0){
@@ -154,16 +167,7 @@ int main(int argc, char *argv[]){
 	totalNodes = countNodes(totallines*2, merged);
 	// constraction cost matrix
 	int cost [totalNodes][totalNodes];
-	for (int i=0; i<totalNodes;i++){
-		for(int j=0; j<totalNodes; j++){
-			if(i==j){
-				cost[i][j] = 0;
-			}
-			else{
-				cost[i][j] = INF;
-			}
-		}
-	}
+	initial_cost_matrix(totalNodes, cost);
 	// fill data in cost matrix
 	for(int i =0; i<totallines; i++){
 		cost[source[i]][destination[i]] = weight[i];
