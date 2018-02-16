@@ -1,3 +1,5 @@
+/* work with split.c*/
+
 #include <stdio.h>
 #include <stdlib.h>
 
