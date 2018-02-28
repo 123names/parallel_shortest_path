@@ -4,9 +4,6 @@
 #include <string.h>
 #include <mpi.h>
 
-const int INF = 999;
-const int SIGNAL = 9999;
-
  void printArray(int size, int *array){
  	for(int i=0; i<size; i++){
  		printf("%d\t", array[i]);
