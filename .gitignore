@@ -1,3 +1,5 @@
 *.txt
 test
 *.bin
+V5, my own mpi run shortest path/script/CMakeFiles/*
+

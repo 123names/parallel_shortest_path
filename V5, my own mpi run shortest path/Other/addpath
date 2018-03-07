@@ -1,0 +1,27 @@
+#!/bin/bash
+# find current directory
+currentdir=`pwd`
+# Temporarily add it to PATH directory
+# export PATH=$PATH:$currentdir
+# Permanently add the directory you're currently in to the PATH variable
+if ! echo $PATH | grep -E -q "(^|:)$currentdir($|:)" ; 
+	then
+	echo "Permanently adding $currentdir to PATH variable. (modify .bashrc)"
+	echo "export PATH=\$PATH:$currentdir" >> ~/.bashrc
+	else
+    echo "$currentdir already in PATH variable."
+fi
+
+
+# Permanently add the directory . in to the PATH variable
+# Warning add . to PATH is dangerous
+
+#if ! echo $PATH | grep -E -q "(^|:).($|:)" ; 
+#	then
+#	echo "Permanently adding . to PATH vairable. (modify .bashrc)"
+#	echo "export PATH=\$PATH:." >> ~/.bashrc
+#	else
+#   echo "$currentdir already in PATH variable."
+#fi
+
+#exit

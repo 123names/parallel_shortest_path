@@ -2,8 +2,10 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
-#include <mpi.h>
 #include "mympi.h"
+
+const int INF = 999;
+const int SIGNAL = 9999;
 
  void printArray(int size, int *array){
  	for(int i=0; i<size; i++){
@@ -246,9 +248,9 @@ int main(int argc, char * argv[]){
         for(int i = 1; i<=numParts; i++){
           int pred_local[partSize];
           int dist_local[partSize];
-          MPI_Recv(&pred_local, partSize , MPI_INT,i, 999, MPI_COMM_WORLD, &status);
+          MPI_Recv(&pred_local, partSize , MPI_INT,i, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
           memcpy(pred+((i-1)*partSize), pred_local, sizeof(pred_local));
-          MPI_Recv(&dist_local, partSize , MPI_INT,i, 1000, MPI_COMM_WORLD, &status);
+          MPI_Recv(&dist_local, partSize , MPI_INT,i, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
           memcpy(dist+((i-1)*partSize), dist_local, sizeof(dist_local));
         }
         flag = false;
@@ -281,8 +283,8 @@ int main(int argc, char * argv[]){
       if(global_min[0]==SIGNAL){
         // write pred to parent
         printArray(partSize, pred_local);
-        MPI_Send(&pred_local, partSize, MPI_INT,0,999,MPI_COMM_WORLD);
-        MPI_Send(&dist_local, partSize, MPI_INT,0,1000,MPI_COMM_WORLD);
+        MPI_Send(&pred_local, partSize, MPI_INT,0,MPI_ANY_TAG,MPI_COMM_WORLD);
+        MPI_Send(&dist_local, partSize, MPI_INT,0,MPI_ANY_TAG,MPI_COMM_WORLD);
         break;
       }
       int nextNode = global_min[1];
@@ -307,7 +309,7 @@ int main(int argc, char * argv[]){
       printArray(partSize, visited_local);
       printArray(partSize, pred_local);
       // write local min to parent, parent calculate global min
-      MPI_Send(&local_minium, 2, MPI_INT,0,rank,MPI_COMM_WORLD);
+      MPI_Send(&local_minium, 2, MPI_INT,0,MPI_ANY_TAG,MPI_COMM_WORLD);
       printf("Child %d send local min dist: %d, node: %d\n", rank, local_minium[0],local_minium[1]);
     }
   }
