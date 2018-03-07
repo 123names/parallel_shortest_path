@@ -47,14 +47,14 @@ struct Pipe CreatePipe(){
     return newPipe;
 }
 
-struct MPILibrary{
+typedef struct MPIProcess{
   pid_t* processes;
   struct Pipe** pipes;
   int numProcesses;
   int rank;
-} MPILibrary;
+} MPIProcess;
 
-struct MPILibrary singleton;
+struct MPIProcess singleton;
 
 int MPI_Init(int * argc, char*** argv){
   // always keep last item as number of process
@@ -88,7 +88,6 @@ int MPI_Init(int * argc, char*** argv){
       }
   }
   // remove first and last argument since user will not using it
-  //printf("Deducting argv");
   *argc -= 1;
   (*argv)[*argc][0] = '\0';
 
